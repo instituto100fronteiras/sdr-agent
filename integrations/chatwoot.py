@@ -115,6 +115,21 @@ class ChatwootClient:
             logger.warning(f"Erro ao verificar recusa para contato {contact_id}: {e}")
             return False
 
+    @retry_with_logging(max_attempts=3)
+    def get_all_contacts(self, page: int = 1) -> List[Dict[str, Any]]:
+        """Recupera lista de contatos (paginada)."""
+        try:
+            url = f"{self.base_url}/api/v1/accounts/{self.account_id}/contacts"
+            params = {"page": page, "sort": "-last_activity_at"}
+            
+            response = requests.get(url, headers=self.headers, params=params, timeout=10)
+            response.raise_for_status()
+            
+            return response.json().get("payload", [])
+        except Exception as e:
+            logger.error(f"Erro ao buscar contatos página {page}: {e}")
+            raise
+
 # Instância global
 try:
     chatwoot = ChatwootClient()
