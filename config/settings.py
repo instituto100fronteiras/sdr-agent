@@ -35,6 +35,9 @@ TRELLO_LIST_ARCHIVED = os.getenv("TRELLO_LIST_ARCHIVED")
 # OpenAI Credentials
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+# SerpAPI Credentials
+SERPAPI_KEY = os.getenv("SERPAPI_KEY")
+
 # Operational Settings
 TIMEZONE = os.getenv("TIMEZONE", "America/Sao_Paulo")
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
