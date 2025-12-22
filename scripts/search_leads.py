@@ -16,6 +16,7 @@ def main():
     parser.add_argument("--query", required=True, help="Termo de busca (ex: arquitetos, clinicas)")
     parser.add_argument("--city", required=True, help="Cidade para busca")
     parser.add_argument("--limit", type=int, default=20, help="Limite de resultados para processar")
+    parser.add_argument("--skip-validation", action="store_true", help="Pula a validação de número de WhatsApp na Evolution API")
     
     args = parser.parse_args()
     
@@ -33,7 +34,7 @@ def main():
             return
 
         # 2. Valida e Salva
-        stats = google_maps_searcher.validate_and_save_leads(results)
+        stats = google_maps_searcher.validate_and_save_leads(results, skip_validation=args.skip_validation)
         
         logger.info("=== Relatório da Busca ===")
         logger.info(f"Encontrados (Google): {stats['encontrados']}")

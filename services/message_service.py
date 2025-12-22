@@ -6,6 +6,7 @@ from integrations.evolution import evolution
 from integrations.chatwoot import chatwoot
 from integrations.supabase_client import supabase
 from services.lead_service import lead_service
+from services.trello_service import trello_service
 from utils.logger import logger
 
 class MessageService:
@@ -50,6 +51,9 @@ class MessageService:
             
             # Agenda follow-up automático para daqui 2 dias (exemplo)
             self.lead_service.schedule_followup(lead["id"], days=2)
+            
+            # 5. Trello Integration
+            trello_service.create_lead_card(lead)
             
             logger.info(f"Primeiro contato enviado para {phone} (Template {template_id})")
             return True
@@ -115,12 +119,14 @@ class MessageService:
         
         if any(w in content_lower for w in stop_words):
             self.lead_service.mark_as_declined(lead["id"])
+            trello_service.on_lead_declined(lead, reason="Solicitou parada (Stop word)")
             logger.info(f"Lead {phone} solicitou parada.")
             return
 
         # Se respondeu qualquer outra coisa, marcamos como respondido (Handover)
         if lead["status"] not in ["responded", "declined", "converted"]:
             self.lead_service.mark_as_responded(lead["id"])
+            trello_service.on_lead_responded(lead)
             logger.info(f"Lead {phone} respondeu. Status atualizado para 'responded'.")
 
     def _check_exists_in_chatwoot(self, phone: str) -> bool:

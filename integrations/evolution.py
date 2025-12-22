@@ -101,19 +101,18 @@ class EvolutionClient:
     def check_number_exists(self, phone: str) -> bool:
         """
         Verifica se o número existe no WhatsApp.
-        Nota: Dependendo da versão da Evolution, o payload pode variar.
+        Usa o endpoint v2: POST /chat/whatsappNumbers/{instance}
         """
         try:
-            url = f"{self.base_url}/chat/checkNumberStatus/{self.instance}/{phone}"
+            url = f"{self.base_url}/chat/whatsappNumbers/{self.instance}"
+            payload = {"numbers": [phone]}
             
-            # Alguns endpoints são GET, outros POST. Tentando GET primeiro (mais comum em versões recentes para single check)
-            response = requests.get(url, headers=self.headers, timeout=15)
-            
-            # Fallback para POST se necessário (implementação futura se der 404/405)
+            # Endpoint v2 é POST
+            response = requests.post(url, json=payload, headers=self.headers, timeout=15)
             response.raise_for_status()
             
             data = response.json()
-            # Resposta varia: { "exists": true } ou [{ "exists": true }]
+            # Resposta v2: [{ "number": "...", "exists": true, "jid": "..." }]
             if isinstance(data, list):
                 if not data: return False
                 return data[0].get('exists', False)
@@ -121,8 +120,7 @@ class EvolutionClient:
             
         except Exception as e:
             logger.warning(f"Erro ao verificar número {phone}: {e}")
-            # Em caso de erro de API, assumimos True para não bloquear o fluxo (fail open) ou False (fail safe)
-            # Fail safe: se não conseguir verificar, melhor não enviar.
+            # Em caso de erro de API, assumimos False (fail safe) para não spammar inválidos
             return False 
 
     def get_message_status(self, message_id: str) -> str:

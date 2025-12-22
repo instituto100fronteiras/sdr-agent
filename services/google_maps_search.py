@@ -62,7 +62,7 @@ class GoogleMapsSearcher:
             logger.error(f"Erro na busca SerpAPI: {e}")
             return []
 
-    def validate_and_save_leads(self, results: List[Dict[str, Any]]) -> Dict[str, int]:
+    def validate_and_save_leads(self, results: List[Dict[str, Any]], skip_validation: bool = False) -> Dict[str, int]:
         """
         Valida telefones (WhatsApp), checa duplicidade e salva.
         """
@@ -102,15 +102,21 @@ class GoogleMapsSearcher:
                 
                 # 4. Valida WhatsApp (Evolution)
                 is_whatsapp = False
-                if evolution:
+                
+                if skip_validation:
+                     # Se pulou validação, assumimos que é válido (ou pelo menos tentaremos salvar)
+                     is_whatsapp = True
+                     logger.debug(f"PULANDO validação de WhatsApp para: {phone}")
+                elif evolution:
                     # check_number_exists pode ser lento, cuidado com rate limit em loops grandes
                     is_whatsapp = evolution.check_number_exists(phone)
                 
                 if not is_whatsapp:
-                    logger.debug(f"Não é WhatsApp: {phone}")
+                    logger.debug(f"Não é WhatsApp (ou falha valid.): {phone}")
                     continue
                     
-                stats["com_whatsapp"] += 1
+                if not skip_validation: # Só conta como 'com_whatsapp' se foi validado
+                    stats["com_whatsapp"] += 1
                 
                 # 5. Salva (Criar Lead)
                 lead_data = {
