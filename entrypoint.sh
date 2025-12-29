@@ -7,7 +7,7 @@ python scripts/run_webhooks.py &
 
 # Iniciar o scheduler em background
 echo "Iniciando Scheduler..."
-python scripts/run_scheduler.py &
+# python scripts/run_scheduler.py &
 
 # Aguarda qualquer processo sair
 wait -n
