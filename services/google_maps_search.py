@@ -2,7 +2,7 @@
 import requests
 from typing import List, Dict, Any
 from serpapi import GoogleSearch
-from config.settings import SERPAPI_KEY
+from config.settings import SERPAPI_KEY, SERPAPI_ENABLED
 from integrations.supabase_client import supabase
 from integrations.chatwoot import chatwoot
 from integrations.evolution import evolution
@@ -18,6 +18,10 @@ class GoogleMapsSearcher:
         """
         Busca empresas no Google Maps via SerpAPI.
         """
+        if not SERPAPI_ENABLED:
+            logger.warning("SERPAPI_ENABLED is False. Skipping search.")
+            return []
+
         logger.info(f"Buscando '{query}' em '{city}' via Google Maps (Limit: {limit})...")
         
         full_query = f"{query} em {city}"

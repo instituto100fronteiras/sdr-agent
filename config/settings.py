@@ -38,6 +38,7 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # SerpAPI Credentials
 SERPAPI_KEY = os.getenv("SERPAPI_KEY")
+SERPAPI_ENABLED = False # Disabled due to quota exhaustion until 2026-01-17
 
 # Operational Settings
 TIMEZONE = os.getenv("TIMEZONE", "America/Sao_Paulo")
